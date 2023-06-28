@@ -1,0 +1,59 @@
+// Import necessary libraries
+const nodemailer = require('nodemailer');
+
+/**
+ * This function sends a picture via email.
+ * 
+ * @param {string} picturePath - The path of the picture file to be sent.
+ * @param {string} recipientEmail - The email address of the recipient.
+ * @param {string} senderEmail - The email address of the sender.
+ * @param {string} senderPassword - The password of the sender's email account.
+ * @returns {Promise} A promise that resolves when the email is sent successfully, or rejects with an error.
+ */
+function sendPictureViaEmail(picturePath, recipientEmail, senderEmail, senderPassword) {
+  return new Promise((resolve, reject) => {
+    // Create a transporter object using SMTP transport
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: senderEmail,
+        pass: senderPassword
+      }
+    });
+
+    // Define the email options
+    const mailOptions = {
+      from: senderEmail,
+      to: recipientEmail,
+      subject: 'Picture',
+      text: 'Please find the attached picture.',
+      attachments: [{
+        filename: 'picture.jpg',
+        path: picturePath
+      }]
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(info);
+      }
+    });
+  });
+}
+
+// Example usage
+const picturePath = '/path/to/picture.jpg';
+const recipientEmail = 'recipient@example.com';
+const senderEmail = 'sender@example.com';
+const senderPassword = 'password';
+
+sendPictureViaEmail(picturePath, recipientEmail, senderEmail, senderPassword)
+  .then(info => {
+    console.log('Email sent:', info.response);
+  })
+  .catch(error => {
+    console.error('Error sending email:', error);
+  });
